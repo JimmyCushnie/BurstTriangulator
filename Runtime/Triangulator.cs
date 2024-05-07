@@ -232,7 +232,7 @@ namespace andywiecko.BurstTriangulator
         {
             public NativeArray<float2> Positions { get; set; }
             
-            public NativeHashSet<int> IgnorePoints { get; set; }
+            public NativeArray<bool> IgnorePositions { get; set; }
             public NativeArray<int> ConstraintEdges { get; set; }
             public NativeArray<float2> HoleSeeds { get; set; }
         }
@@ -310,7 +310,7 @@ namespace andywiecko.BurstTriangulator
             public struct InputData
             {
                 public NativeArray<float2> Positions;
-                public NativeHashSet<int> IgnorePoints;
+                public NativeArray<bool> IgnorePositions;
                 [NativeDisableContainerSafetyRestriction]
                 public NativeArray<int> ConstraintEdges;
                 [NativeDisableContainerSafetyRestriction]
@@ -339,7 +339,7 @@ namespace andywiecko.BurstTriangulator
                 input = new()
                 {
                     Positions = triangulator.Input.Positions,
-                    IgnorePoints = triangulator.Input.IgnorePoints,
+                    IgnorePositions = triangulator.Input.IgnorePositions,
                     ConstraintEdges = triangulator.Input.ConstraintEdges,
                     HoleSeeds = triangulator.Input.HoleSeeds,
                 };
@@ -401,7 +401,7 @@ namespace andywiecko.BurstTriangulator
                 {
                     status = output.Status,
                     positions = localPositions.AsArray(),
-                    ignorePoints = input.IgnorePoints,
+                    ignorePositions = input.IgnorePositions,
                     triangles = triangles,
                     halfedges = halfedges,
                     hullStart = int.MaxValue,
@@ -609,7 +609,7 @@ namespace andywiecko.BurstTriangulator
 
             public NativeList<int> halfedges;
             
-            public NativeHashSet<int> ignorePoints;
+            public NativeArray<bool> ignorePositions;
 
             [NativeDisableContainerSafetyRestriction]
             private NativeList<int> ids;
@@ -661,7 +661,7 @@ namespace andywiecko.BurstTriangulator
                 using var _hullTri = hullTri = new(n, Allocator.Temp);
                 using var _hullHash = hullHash = new(hashSize, Allocator.Temp);
 
-                using var _ids = ids = new(n - ignorePoints.Count, Allocator.Temp);
+                using var _ids = ids = new(n, Allocator.Temp);
                 using var _dists = dists = new(n, Allocator.Temp);
 
                 using var _EDGE_STACK = EDGE_STACK = new(512, Allocator.Temp);
@@ -671,7 +671,7 @@ namespace andywiecko.BurstTriangulator
                 
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    if (ignorePoints.Contains(i))
+                    if (ignorePositions[i])
                         continue;
                     
                     var p = positions[i];
