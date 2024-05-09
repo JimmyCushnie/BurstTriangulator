@@ -310,6 +310,7 @@ namespace andywiecko.BurstTriangulator
             public struct InputData
             {
                 public NativeArray<float2> Positions;
+                [NativeDisableContainerSafetyRestriction]
                 public NativeArray<bool> IgnorePositions;
                 [NativeDisableContainerSafetyRestriction]
                 public NativeArray<int> ConstraintEdges;
@@ -609,8 +610,8 @@ namespace andywiecko.BurstTriangulator
 
             public NativeList<int> halfedges;
             
+            [NativeDisableContainerSafetyRestriction]
             public NativeArray<bool> ignorePositions;
-
             [NativeDisableContainerSafetyRestriction]
             private NativeList<int> ids;
             [NativeDisableContainerSafetyRestriction]
@@ -671,7 +672,7 @@ namespace andywiecko.BurstTriangulator
                 
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    if (ignorePositions[i])
+                    if (ignorePositions.IsCreated && ignorePositions[i])
                         continue;
                     
                     var p = positions[i];
